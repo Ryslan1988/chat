@@ -1,38 +1,64 @@
 package server;
 
+import db.JdbcApp;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.sql.SQLException;
 import java.util.List;
+import java.util.Vector;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+
 
 public class Server {
     private ServerSocket server;
     private Socket socket;
     private final int PORT = 8189;
+    private JdbcApp jdbcApp;
+    private final Logger LOGGER = LogManager.getLogger(Server.class);
+
 
     private List<ClientHandler> clients;
     private AuthService authService;
+    private ExecutorService clientsExecutorService;
 
-    public Server() {
+    public Server() throws SQLException {
         clients = new CopyOnWriteArrayList<>();
+
+
         authService = new SimpleAuthService();
+
+
+
+
         try {
             server = new ServerSocket(PORT);
-            System.out.println("Server started!");
+
+//            System.out.println("Server started!");
+            LOGGER.info("Server started!");
 
             while (true) {
                 socket = server.accept();
-                System.out.println("Client connected");
+//                System.out.println("Client connected");
+                LOGGER.info("Client connected");
                 new ClientHandler(socket, this);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
+            LOGGER.throwing(Level.ERROR, e);
         } finally {
             try {
                 server.close();
             } catch (IOException e) {
-                e.printStackTrace();
+//                e.printStackTrace();
+                LOGGER.throwing(Level.ERROR, e);
             }
         }
     }
@@ -55,14 +81,14 @@ public class Server {
                 return;
             }
         }
-        sender.sendMsg("Not found user: "+ receiver);
+        sender.sendMsg("Not found user: " + receiver);
     }
 
     public boolean isLoginAuthenticated(String login) {
         for (ClientHandler c : clients) {
-           if(c.getLogin().equals(login)){
-               return true;
-           }
+            if (c.getLogin().equals(login)) {
+                return true;
+            }
         }
         return false;
     }

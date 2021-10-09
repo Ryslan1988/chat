@@ -1,5 +1,10 @@
 package server;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.simple.SimpleLogger;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -11,7 +16,7 @@ public class ClientHandler {
     DataInputStream in;
     DataOutputStream out;
     SimpleAuthService simpl;
-
+    private final Logger LOGGER = LogManager.getLogger(ClientHandler.class);
     private boolean authenticated;
     private String nickname;
     private String login;
@@ -33,7 +38,8 @@ public class ClientHandler {
 
                         if (str.equals("/end")) {
                             sendMsg("/end");
-                            System.out.println("Client disconnected");
+//                            System.out.println("Client disconnected");
+                            LOGGER.info("Client disconnected");
                             break;
                         }
                         if (str.startsWith("/auth ")) {
@@ -77,7 +83,8 @@ public class ClientHandler {
                         if (str.startsWith("/")) {
                             if (str.equals("/end")) {
                                 sendMsg("/end");
-                                System.out.println("Client disconnected");
+//                                System.out.println("Client disconnected");
+                                LOGGER.info("Client disconnected");
                                 break;
                             }
 
@@ -94,18 +101,21 @@ public class ClientHandler {
                     }
                 // SocketTimeoutException
                 } catch (IOException e) {
-                    e.printStackTrace();
+//                    e.printStackTrace();
+                    LOGGER.throwing(Level.ERROR, e);
                 } finally {
                     server.unsubscribe(this);
                     try {
                         socket.close();
                     } catch (IOException e) {
-                        e.printStackTrace();
+//                        e.printStackTrace();
+                        LOGGER.throwing(Level.ERROR, e);
                     }
                 }
             }).start();
         } catch (IOException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
+            LOGGER.throwing(Level.ERROR, e);
         }
     }
 
@@ -113,7 +123,8 @@ public class ClientHandler {
         try {
             out.writeUTF(msg);
         } catch (IOException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
+            LOGGER.throwing(Level.ERROR, e);
         }
     }
 

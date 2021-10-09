@@ -11,7 +11,7 @@ public class JdbcApp  {
         try {
             connect();
 //            createTableEx();
-            insertEx();
+//            insertEx();
 
         } catch (Exception e) {
             e.printStackTrace();
