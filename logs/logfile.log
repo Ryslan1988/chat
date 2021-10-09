@@ -1,0 +1,3 @@
+INFO  2021-10-09 16:58:32 [main] server.Server (Server.java:45) - Server started!
+INFO  2021-10-09 17:03:46 [main] server.Server (Server.java:50) - Client connected
+INFO  2021-10-09 17:03:51 [Thread-1] server.ClientHandler (ClientHandler.java:87) - Client disconnected
