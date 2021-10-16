@@ -19,11 +19,11 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 public class Controller implements Initializable {
@@ -109,6 +109,7 @@ public class Controller implements Initializable {
                             if (str.startsWith("/authok")) {
                                 nickname = str.split("\\s")[1];
                                 setAuthenticated(true);
+                                loadHistoryMsg();
                                 break;
                             }
                             if (str.equals("/regok")) {
@@ -139,6 +140,7 @@ public class Controller implements Initializable {
                             }
                         } else {
                             textArea.appendText(str + "\n");
+                            SaveHistoryMsg();
                         }
                     }
 
@@ -228,8 +230,8 @@ public class Controller implements Initializable {
         regStage.show();
     }
 
-    public void registration(String login, String password, String nickname){
-        String msg = String.format("/reg %s %s %s",login, password, nickname);
+    public void registration(String login, String password, String nickname) {
+        String msg = String.format("/reg %s %s %s", login, password, nickname);
 
         if (socket == null || socket.isClosed()) {
             connect();
@@ -241,4 +243,45 @@ public class Controller implements Initializable {
             e.printStackTrace();
         }
     }
+
+    private void SaveHistoryMsg() throws IOException {
+        try {
+            File history = new File("historyMsg.txt");
+            if (!history.exists()) {
+                System.out.println("Файла истории отсутствует,создайте его");
+                history.createNewFile();
+            }
+            PrintWriter fileWriter = new PrintWriter(new FileWriter(history, false));
+            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+            bufferedWriter.write(textArea.getText());
+            bufferedWriter.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loadHistoryMsg() throws IOException {
+        int sizeHistory = 100;
+        File historyMsg = new File("historyMsg.txt");
+        List<String> historyList = new ArrayList<>();
+        FileInputStream in = new FileInputStream(historyMsg);
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
+
+        String temp;
+        while ((temp = bufferedReader.readLine()) != null) {
+            historyList.add(temp);
+        }
+
+        if (historyList.size() > sizeHistory) {
+            for (int i = historyList.size() - sizeHistory; i <= (historyList.size() - 1); i++) {
+                textArea.appendText(historyList.get(i) + "\n");
+            }
+        } else {
+            for (int i = 0; i < sizeHistory; i++) {
+                System.out.println(historyList.get(i));
+            }
+        }
+    }
+
 }
